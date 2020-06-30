@@ -2129,7 +2129,7 @@ const Gpu = class SystemMonitor_Gpu extends ElementBase {
         super({
             elt: 'gpu',
             item_name: _('GPU'),
-            color_name: ['used']
+            color_name: ['used', 'memory']
         });
         this.max = 100;
 
@@ -2214,14 +2214,15 @@ const Gpu = class SystemMonitor_Gpu extends ElementBase {
     }
     _apply() {
         if (this.total === 0) {
-            this.vals = [0];
-            this.tip_vals = [0];
+            this.vals = [0, 0];
+            this.tip_vals = [0, 0];
         } else {
-            this.vals = [this.percentage];
-            this.tip_vals = [Math.round(this.vals[0])];
+            // The cumulative function of the graph is always the memory usage
+            this.vals = [this.percentage, this.mem / this.total * 100 - this.percentage];
+            this.tip_vals = [Math.round(this.vals[0]), Math.round(this.mem / this.total * 100)];
         }
-        this.text_items[0].text = this.tip_vals.toString();
-        this.menu_items[0].text = this.tip_vals.toLocaleString();
+        this.text_items[0].text = this.tip_vals[0].toString();
+        this.menu_items[0].text = this.tip_vals[0].toLocaleString();
         if (Style.get('') !== '-compact') {
             this.menu_items[3].text = this._pad(this.mem).toLocaleString() +
                 '  /  ' + this._pad(this.total).toLocaleString();
